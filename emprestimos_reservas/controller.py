@@ -1,20 +1,21 @@
 from flask import Blueprint, request, jsonify
-from  model import Loanoan
+from  model import Loan
 import requests
+import os
 
 loan_blueprint = Blueprint('loan', __name__)
 
 loans = {}
 
 def verificar_user(user_id):
+    USER_SERVICE_URL = os.getenv('USER_SERVICE_URL', 'http://user_service:6000/users/')
     try:
-        response = requests.get(f'http://localhost:5000/users/{user_id}')
-        if response.status_code == 200:
-            return True
-        else:
-            return False
+        response = requests.get(f'{USER_SERVICE_URL}/users/{user_id}')
+        return response.status_code == 200
+    
     except requests.exceptions.RequestException as e:
         print("Erro ao conectar ao serviço de utilizadores", e)
+        return False
 
 
 @loan_blueprint.route('/<int:loan_id>', methods=['GET'])
